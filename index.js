@@ -13,9 +13,17 @@ app.use(express.static("public"));
 app.use(express.json());
 
 // ROUTES //
+const connection = require("./database/db");
 app.get("/", (rer, res) => {
-    res.json("Benvenuto in App!");
+    connection.query("SELECT * FROM movies", (err, results) => {
+        if(err) throw err;
+
+        res.json({
+            movies: results,
+        });
+    });
 });
+
  //MIDDLWARE //
 app.use(notFound);
 app.use (errorHandler);

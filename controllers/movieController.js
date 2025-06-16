@@ -5,10 +5,11 @@ const index = (req, res) => {
 
     connection.query(moviesql, (err, results) => {
         if(err) return res.ststus(500).json({messagge: "Server error!"});
-
+        const movies = results.map((movie) => formDataMovie(movie))
         res.json({
-            movies: results,
+            movies,
         });
+       
     });
 };
 
@@ -21,7 +22,7 @@ const show = (req, res) => {
         if(err) return res.ststus(500).json({messagge: "Server error!"});
         if (results.length === 0) return res.status(404).json ({messagge:"Not Found!"});
         
-        const movie = results[0];
+        const movie = formDataMovie(results[0]);
         const reviewsSql = 
         "SELECT * FROM reviews WHERE movie_id = ? " ;
 
@@ -35,5 +36,11 @@ const show = (req, res) => {
         })
     });
 };
+const formDataMovie = (movie) =>{
+    if(movie.movies_cover){
+        movie.movies_cover= "http://localhost:3000/img/movies_cover/" + movie.movies_cover;
+    }
+    return movie;
 
+}
 module.exports = { index, show };

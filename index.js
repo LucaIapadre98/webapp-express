@@ -1,7 +1,9 @@
 // IMPORT //
 require("dotenv").config();
 express = require("express");
+const movieRouter = require("./routers/movieRouter");
 const{ notFound, errorHandler }= require("./middlewares/notFound");
+const connection = require("./database/db")
 
 
 // CONFIG //    
@@ -12,21 +14,13 @@ const host = `${APP_URL}:${APP_PORT}`
 app.use(express.static("public"));
 app.use(express.json());
 
-// ROUTES //
-const connection = require("./database/db");
-app.get("/", (rer, res) => {
-    connection.query("SELECT * FROM movies", (err, results) => {
-        if(err) throw err;
+// ROUTER //
+app.use("/movies", movieRouter);
 
-        res.json({
-            movies: results,
-        });
-    });
-});
-
- //MIDDLWARE //
+//MIDDLWARE //
 app.use(notFound);
 app.use (errorHandler);
+
 
 //LISTEN //
 app.listen(APP_PORT, () => {

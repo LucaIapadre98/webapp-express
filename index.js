@@ -16,6 +16,7 @@ app.use(express.json());
 
 // ROUTER //
 app.use("/movies", movieRouter);
+app.use("/:id", movieRouter);
 
 //MIDDLWARE //
 app.use(notFound);

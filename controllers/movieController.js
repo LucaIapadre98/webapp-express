@@ -1,4 +1,5 @@
 const connection = require("../database/db");
+const movieImg = "http://localhost:3000/img/movies/";
 
 const index = (req, res) => {
     const moviesql = "SELECT * FROM movies";
@@ -12,7 +13,6 @@ const index = (req, res) => {
        
     });
 };
-
 
 const show = (req, res) => {
     const { id } = req.params;
@@ -31,16 +31,59 @@ const show = (req, res) => {
 
             movie.reviews = results;
             res.json({
-                movie: results,
+                movie,
             });
         })
     });
 };
+
+const storeReview = (req, res) =>{
+    const { id } = req.params;
+    const { name, vote, text} = req.body;
+
+    let errors = [];
+
+    if(!vote || vote < 1 || vote >10){
+        errors.push({
+            messagge: " Il voto va tra 1 e 10",
+        });
+    }
+
+    if(errors.length){
+        return res.status(403).json({
+            messagge: "Invalid",
+            errors,
+        });
+    }
+
+    const sqlStoreReview = `
+    INSERT INTO movies.reviews
+    ( movie_id, name, vote, text) 
+    VALUES ( ?,?,?,?)`;
+
+    const sqlStoreReviewValues = [
+        id,
+        name,
+        vote,
+        text,
+    ];
+    connection.query(sqlStoreReview, sqlStoreReviewValues, (err, results) =>{
+        if(err)  return res.status(500).json({messagge:"Error server", err});
+        console.log(results);
+        
+        res.status(201).json({
+            messagge:"review added",
+            id: results.insertId,
+        })
+    })
+
+};
+
 const formDataMovie = (movie) =>{
-    if(movie.movies_cover){
-        movie.movies_cover= "http://localhost:3000/img/movies_cover/" + movie.movies_cover;
+    if(movie.image){
+        movie.image= movieImg + movie.image;
     }
     return movie;
 
-}
-module.exports = { index, show };
+};
+module.exports = { index, show, storeReview };
